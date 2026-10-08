@@ -1,0 +1,16 @@
+# Sample raw IOCs (fake values for testing the script)
+# Note: 203.0.113.0/24 and 192.168.0.0/16 are reserved ranges, so the script filters them out on purpose
+hxxps://secure-bank-login[.]example-phish[.]com/verify?id=123
+HXXPS://SECURE-BANK-LOGIN[.]EXAMPLE-PHISH[.]COM/verify?id=123
+https://secure-bank-login.example-phish.com/verify?id=123
+egov-notify[.]top
+Egov-Notify.top.
+203.0.113.45
+203.0.113.45
+192.168.1.10
+fonts.googleapis.com
+https://www.google.com/search?q=test
+44d88612fea8a8f36de82e1278abb02f
+275A021BBFB6489E54D471899F7DB9D1663FC695EC2FE2A2C4538AABF651FD0F
+invoice-dept[@]payroll-update[.]xyz
+not an indicator at all

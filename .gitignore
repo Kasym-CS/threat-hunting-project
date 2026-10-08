@@ -4,3 +4,5 @@
    *.pyc
    raw_iocs_live*.txt
    clean_iocs.csv
+   clean_iocs.csv
+   misp_event*.json

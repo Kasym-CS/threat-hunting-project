@@ -1,0 +1,152 @@
+{
+  "name": "APT29 Nov 2018 phishing - Kill Chain mapping",
+  "versions": {
+    "layer": "4.5",
+    "navigator": "5.1.0",
+    "attack": "16"
+  },
+  "domain": "enterprise-attack",
+  "description": "Week 4: techniques observed in the suspected APT29 phishing campaign (FireEye, Nov 2018), coloured by Kill Chain stage.",
+  "techniques": [
+    {
+      "techniqueID": "T1589.002",
+      "color": "#9ecae1",
+      "comment": "Kill Chain: Reconnaissance",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1591",
+      "color": "#9ecae1",
+      "comment": "Kill Chain: Reconnaissance",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1583.001",
+      "color": "#6baed6",
+      "comment": "Kill Chain: Weaponization",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1584",
+      "color": "#6baed6",
+      "comment": "Kill Chain: Weaponization",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1588.002",
+      "color": "#6baed6",
+      "comment": "Kill Chain: Weaponization",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1608.001",
+      "color": "#6baed6",
+      "comment": "Kill Chain: Weaponization",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1566.002",
+      "color": "#fd8d3c",
+      "comment": "Kill Chain: Delivery",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1656",
+      "color": "#fd8d3c",
+      "comment": "Kill Chain: Delivery",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1204.001",
+      "color": "#f16913",
+      "comment": "Kill Chain: Exploitation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1204.002",
+      "color": "#f16913",
+      "comment": "Kill Chain: Exploitation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.001",
+      "color": "#d94801",
+      "comment": "Kill Chain: Installation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1027",
+      "color": "#d94801",
+      "comment": "Kill Chain: Installation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1140",
+      "color": "#d94801",
+      "comment": "Kill Chain: Installation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1218.011",
+      "color": "#d94801",
+      "comment": "Kill Chain: Installation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1036",
+      "color": "#d94801",
+      "comment": "Kill Chain: Installation",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1071.001",
+      "color": "#a63603",
+      "comment": "Kill Chain: C2",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1573.002",
+      "color": "#a63603",
+      "comment": "Kill Chain: C2",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1001.003",
+      "color": "#a63603",
+      "comment": "Kill Chain: C2",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1055",
+      "color": "#a63603",
+      "comment": "Kill Chain: C2",
+      "enabled": true
+    }
+  ],
+  "legendItems": [
+    {
+      "label": "Reconnaissance",
+      "color": "#9ecae1"
+    },
+    {
+      "label": "Weaponization",
+      "color": "#6baed6"
+    },
+    {
+      "label": "Delivery",
+      "color": "#fd8d3c"
+    },
+    {
+      "label": "Exploitation",
+      "color": "#f16913"
+    },
+    {
+      "label": "Installation",
+      "color": "#d94801"
+    },
+    {
+      "label": "C2",
+      "color": "#a63603"
+    }
+  ]
+}

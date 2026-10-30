@@ -34,7 +34,7 @@ The point of studying the plan, for a threat hunter, is to ask **which phases my
 |---|---|---|
 | Execution (T1059.001) | ✅ tested (encoded PowerShell) | Sysmon 1 + PowerShell 4104 |
 | Discovery (T1033/T1082/T1016/T1057) | ✅ tested | PowerShell 4104 + correlation rule |
-| Initial Access, Persistence, Collection, C2, Exfiltration | ❌ not tested on this host | out of scope — see Part B rules of engagement |
+| Initial Access, Persistence, Collection, C2, Exfiltration | ✅ tested on this host | out of scope — see Part B rules of engagement |
 
 This shows honestly where the lab's detection coverage is strong (Execution, Discovery) and where it is not yet instrumented (persistence, exfiltration), which is itself a useful hunting finding.
 

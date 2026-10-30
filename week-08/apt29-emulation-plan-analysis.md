@@ -1,50 +1,139 @@
-# Week 8 (Part A) — Analysis of the Published MITRE APT29 Emulation Plan
+# APT29 Emulation Plan Analysis
 
-**Task (syllabus §3.3):** develop a simple adversary-emulation plan (initial access → persistence → data exfiltration) and document it using MITRE ATT&CK techniques.
+## 1. Purpose
 
-This part documents a real, **published** adversary-emulation plan rather than inventing one: the **MITRE Center for Threat-Informed Defense APT29 emulation plan**. Documenting an existing, authoritative plan satisfies the "develop and document a plan" requirement and ties directly to the project — APT29 is the group analysed in the week-4 Kill Chain and is the subject of week 10.
+This document explains why APT29 was selected, maps selected adversary behaviors to MITRE ATT&CK, and describes the safe lab equivalents used in this project. The scenario focuses on PowerShell and basic Windows telemetry. It is an educational behavior-emulation exercise, not a reproduction of a full APT29 intrusion or the execution of malware.
 
-## Why APT29
+## 2. APT29 Overview
 
-- APT29 (G0016, "Cozy Bear") is a well-documented state-sponsored group whose intrusions begin with **spear-phishing** and rely heavily on **PowerShell** — the exact chain this project follows since week 1.
-- MITRE has published a full, free emulation plan for it, so the techniques below are taken from an authoritative source, not assembled by guesswork.
+APT29 is a threat group tracked by MITRE ATT&CK under Group ID **G0016**. The group is also associated with several other names. MITRE's profile summarizes techniques and procedures observed across different operations and time periods.
 
-## The emulation plan mapped to ATT&CK
+Relevant examples documented by MITRE include:
 
-The published plan is organised as an end-to-end intrusion. The table lists its phases and representative ATT&CK techniques, following the syllabus structure *initial access → persistence → data exfiltration*.
+- The use of compromised local accounts to access victim networks.
+- The use of Registry Run keys to establish persistence.
+- The use of PowerShell, including encoded PowerShell scripts in some operations.
+- The exfiltration of collected data over HTTPS during the SolarWinds Compromise.
 
-| Phase | ATT&CK tactic | Representative techniques (ID) | What the plan describes at this phase |
-|---|---|---|---|
-| Initial Access | Initial Access (TA0001) | T1566.001 Spearphishing Attachment; T1204.002 User Execution: Malicious File | A user opens a delivered file, starting code execution |
-| Execution | Execution (TA0002) | **T1059.001 PowerShell**; T1059.003 Windows Command Shell | Scripted commands run on the host (the project's core technique) |
-| Defense Evasion | Defense Evasion (TA0005) | T1027 Obfuscated Files or Information; T1140 Deobfuscate/Decode | Payloads and commands are encoded/obfuscated |
-| Discovery | Discovery (TA0007) | T1033 System Owner/User; T1082 System Information; T1016 Network Config; T1057 Process | The actor profiles the host and environment |
-| Persistence | Persistence (TA0003) | **T1547.001 Registry Run Keys / Startup Folder**; T1053.005 Scheduled Task | Code is set to run again automatically after reboot or logon |
-| Collection | Collection (TA0009) | T1005 Data from Local System; T1560 Archive Collected Data | Files of interest are gathered and packaged |
-| Command and Control | Command and Control (TA0011) | T1071.001 Web Protocols; T1573 Encrypted Channel | The host talks to attacker infrastructure |
-| Exfiltration | Exfiltration (TA0010) | T1041 Exfiltration Over C2 Channel; T1567 Exfiltration Over Web Service | Collected data leaves the host |
+The ATT&CK group profile aggregates observations from multiple campaigns. The presence of a technique on the profile does not mean that every technique was used in every operation, or that all techniques listed here occurred in one single attack chain.
 
-*Technique IDs are from MITRE ATT&CK for APT29 (G0016) and the published emulation plan. This table is a description of that plan, not an execution guide.*
+**Primary source:** [MITRE ATT&CK — APT29 (G0016)](https://attack.mitre.org/groups/G0016/)
 
-## How the plan connects to the detection work
+## 3. Selected MITRE ATT&CK Techniques
 
-The point of studying the plan, for a threat hunter, is to ask **which phases my monitoring can already see**. Part B of week 8 (`detection-validation-plan.md`) tested the safe, read-only parts of this chain — Execution and Discovery — on the lab host and confirmed detection in Splunk:
+| Scenario phase | ATT&CK ID | Technique | APT29 context | Safe lab equivalent |
+|---|---|---|---|---|
+| Initial-access context | [T1078.003](https://attack.mitre.org/techniques/T1078/003/) | Valid Accounts: Local Accounts | MITRE reports that APT29 used compromised local accounts to access victim networks and targeted dormant or inactive accounts. | The tester used an already-authorized local account and inspected the signed-in user context. No account compromise or credential acquisition was simulated. |
+| Persistence | [T1547.001](https://attack.mitre.org/techniques/T1547/001/) | Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder | MITRE reports that APT29 added Registry Run keys to establish persistence. | A temporary user-level Run value launched a harmless marker script. Its execution after a new logon was confirmed by the marker file. |
+| Data-exfiltration technique selected for analysis | [T1048.002](https://attack.mitre.org/techniques/T1048/002/) | Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol | MITRE maps the SolarWinds Compromise to this sub-technique and describes collected data being sent over an HTTPS request to a password-protected archive staged on a victim OWA server. | A local HTTP transfer to `127.0.0.1` was prepared as a limited file-transfer demonstration. It does **not** implement T1048.002 and is not evidence of host-to-external exfiltration. |
+| Supporting execution technique | [T1059.001](https://attack.mitre.org/techniques/T1059/001/) | Command and Scripting Interpreter: PowerShell | MITRE documents APT29's use of encoded PowerShell scripts in some CozyCar-related procedures and PowerShell during the SolarWinds Compromise. | Only benign PowerShell commands and a harmless marker script were used. No malicious encoded command, payload download, or remote execution was performed. |
 
-| Plan phase | Covered by the week-8 detection test? | Evidence |
-|---|---|---|
-| Execution (T1059.001) | ✅ tested (encoded PowerShell) | Sysmon 1 + PowerShell 4104 |
-| Discovery (T1033/T1082/T1016/T1057) | ✅ tested | PowerShell 4104 + correlation rule |
-| Initial Access, Persistence, Collection, C2, Exfiltration | ✅ tested on this host | out of scope — see Part B rules of engagement |
+### Technique-mapping note
 
-This shows honestly where the lab's detection coverage is strong (Execution, Discovery) and where it is not yet instrumented (persistence, exfiltration), which is itself a useful hunting finding.
+T1078.003 is included as an **authorized-account context simulation**, not as proof that Initial Access was achieved by an adversary. Similarly, the local HTTP exercise is an auxiliary transfer test, not a successful emulation of the selected APT29 exfiltration technique. These distinctions are important for accurate ATT&CK mapping and reporting.
 
-## Conclusion
+## 4. Lab Environment and Method
 
-A complete initial-access → persistence → exfiltration plan exists and is documented here through MITRE's published APT29 emulation plan and its ATT&CK techniques. The project's own practical contribution is on the **detection** side (Part B): verifying that the Execution and Discovery phases of this chain are visible in the Sysmon + Splunk pipeline built in weeks 6–7.
+The work was performed manually on a personal Windows laptop. No virtual machine and no MITRE CALDERA deployment were used. Windows PowerShell and Event Viewer were used for the host-side actions and manual log review. Python 3.12.10 was available for the optional localhost HTTP receiver.
 
-## References
+The lab was limited to a single host and synthetic data. No corporate files, passwords, personal data, exploit code, malware, external upload destinations, or lateral movement were involved.
 
-- MITRE Center for Threat-Informed Defense — Adversary Emulation Library, APT29 plan: https://ctid.mitre.org/resources/adversary-emulation-library/
-- MITRE ATT&CK — APT29 (G0016): https://attack.mitre.org/groups/G0016/
-- MITRE ATT&CK — T1059.001, T1547.001, T1041 (technique pages)
-- K. Wilhoit, *Operationalizing Threat Intelligence*, 2022
+### 4.1. Initial host checks
+
+The initial checks recorded the current user, hostname, operating-system context, PowerShell version, and current time. The availability of the `Microsoft-Windows-PowerShell/Operational` log was also inspected.
+
+Example commands used for basic context:
+
+```powershell
+Get-Date -Format o
+$env:COMPUTERNAME
+whoami
+$PSVersionTable.PSVersion
+```
+
+### 4.2. Initial-access context — T1078.003 (behavioral analogue)
+
+**Objective:** document the context of an already-authorized local account and the PowerShell activity performed after sign-in.
+
+The following benign commands were executed:
+
+```powershell
+Write-Output "APT29-LAB-IA-01"
+whoami
+hostname
+Get-Date -Format o
+```
+
+**Expected evidence sources:** Windows Security Event ID 4624 for a successful logon; Event ID 4688 for process creation if process-creation auditing is enabled; and PowerShell Operational Event ID 4104 if Script Block Logging was enabled.
+
+**Interpretation boundary:** the test did not demonstrate how an attacker obtained the account or initially entered the system. It only documented an authorized user context and subsequent local PowerShell activity.
+
+### 4.3. Persistence — T1547.001
+
+**Objective:** check whether a user-level Registry Run entry can launch a harmless script at logon.
+
+A marker script was created. Its only action was to append a timestamped string to `%TEMP%\APT29-LAB-PERSISTENCE.txt`. A temporary value named `APT29-LAB` was added under:
+
+```text
+HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+```
+
+The tester signed out and signed back in using the same Windows account, then checked the marker file. The following output was observed:
+
+```text
+APT29-LAB-PERSISTENCE 30.10.2026 1:04:49,25
+```
+
+**Result:** the marker output confirms that the harmless script ran during the subsequent logon.
+
+**Potential evidence sources:** Sysmon Event IDs 12–14 when Sysmon is installed and configured for the relevant registry events; Windows Security Event ID 4657 when registry auditing and the required SACL are configured; and process-creation or PowerShell events if the relevant audit settings are enabled.
+
+The marker file confirms functional execution. It does not, by itself, prove that a security event or detection alert was generated.
+
+### 4.4. Data transfer — T1048.002 selected for analysis, not validated
+
+**Objective:** prepare synthetic data and demonstrate a basic file transfer to a receiver on the same host.
+
+A text file containing only synthetic values was created. A Python HTTP receiver was configured to listen on `127.0.0.1:8088`. PowerShell was used to submit the file to the local receiver. File integrity could then be checked by comparing the SHA-256 hashes of the source and received files.
+
+**Critical limitation:** the loopback address `127.0.0.1` routes traffic within the same computer. The local HTTP test does not transfer data off-host, does not use HTTPS/TLS, and does not reproduce the APT29 procedure mapped to T1048.002. A valid test of that behavior would require a separately controlled receiving system and an authorized encrypted non-C2 channel. That activity was outside the scope of this project.
+
+Complete these fields only after reviewing the actual command output or saved evidence:
+
+- HTTP response status: `[actual status / Not verified]`
+- Received file exists: `[Yes / No / Not verified]`
+- Source and received SHA-256 hashes match: `[Yes / No / Not verified]`
+- Receiver bind address: `127.0.0.1:8088`
+
+## 5. Role of PowerShell — T1059.001
+
+PowerShell was the primary interface for the benign commands and test actions. T1059.001 describes the command interpreter used to execute the commands; it does not replace the behavior-specific technique selected for each scenario phase.
+
+The lab used PowerShell for local context checks, synthetic file creation, and review of test results. It did not use credential theft, defense impairment, lateral movement, payload downloads, or remote command execution.
+
+## 6. Cleanup
+
+After testing, the temporary `APT29-LAB` value was removed from the current user's Run key, the persistence marker file was deleted, and the `APT29-Lab` working directory was removed. The evidence directory was retained.
+
+The final path checks returned:
+
+```text
+APT29-Lab: False
+Documents\APT29-Lab-Evidence: True
+```
+
+Windows event logs were not deleted.
+
+## 7. Conclusion
+
+The lab confirmed that a harmless user-level Run entry could launch a marker script after the next logon. It also included benign PowerShell context checks and preparation of a localhost file-transfer test using synthetic data.
+
+The exercise demonstrates how selected behaviors associated with APT29 can be studied safely and mapped to ATT&CK. It should not be described as a full APT29 emulation. In particular, the localhost HTTP transfer does not validate T1048.002, and using an already-authorized account does not reproduce the adversary's initial-access method.
+
+## 8. References
+
+- [MITRE ATT&CK — APT29 (G0016)](https://attack.mitre.org/groups/G0016/)
+- [MITRE ATT&CK — T1078.003 Valid Accounts: Local Accounts](https://attack.mitre.org/techniques/T1078/003/)
+- [MITRE ATT&CK — T1547.001 Registry Run Keys / Startup Folder](https://attack.mitre.org/techniques/T1547/001/)
+- [MITRE ATT&CK — T1048.002 Exfiltration Over Asymmetric Encrypted Non-C2 Protocol](https://attack.mitre.org/techniques/T1048/002/)
+- [MITRE ATT&CK — T1059.001 PowerShell](https://attack.mitre.org/techniques/T1059/001/)

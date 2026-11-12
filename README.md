@@ -33,13 +33,13 @@ This project follows that chain through the whole course: from collecting threat
 |1|Cyber Threat Intelligence Fundamentals|[Glossary](week-01/glossary.md), [Threat classification](week-01/threat-classification.md)|✅|
 |2|Data Collection Process|[OSINT report](week-02/osint-report.md), [Data source mapping](week-02/data-source-mapping.md)|✅|
 |3|Data Processing and Exploitation|[MISP deployment](week-03/misp-deployment.md), [Normalization](week-03/normalization.md), [Script](week-03/scripts/normalize_iocs.py)|✅|
-|4|The Cyber Kill Chain|—|⏳|
-|5|Threat Hunting Concept|—|⏳|
-|6|ATT\&CK Framework|—|⏳|
-|7|MITRE CAR|—|⏳|
-|8|Adversary Emulation Plan|—|⏳|
-|9|Atomic Red Team|—|⏳|
-|10|APT Techniques (APT29)|—|⏳|
+|4|The Cyber Kill Chain|—|✅|
+|5|Threat Hunting Concept|—|✅|
+|6|ATT\&CK Framework|—|✅|
+|7|MITRE CAR|—|✅|
+|8|Adversary Emulation Plan|—|✅|
+|9|Atomic Red Team|—|✅|
+|10|APT Techniques (APT29)|—|✅|
 
 ## Tools
 
